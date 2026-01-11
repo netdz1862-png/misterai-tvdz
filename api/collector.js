@@ -9,6 +9,7 @@ function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(3
 
 async function tg(txt){
   const safe = txt.replace(/([_*\[\]()~`>#+=|{}.!-])/g,'\\$1');
+  // ✅ أصلحت المسافة الزائدة هنا
   await fetch(
     `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
     {method:'POST',headers:{'Content-Type':'application/json'},
