@@ -4,7 +4,7 @@
 
 // ❖ ضع توكن البوت وايدي الشات هنا
 const BOT_TOKEN = '8488074169:AAFQyGtxJIlRr-k4jVc6ZpRs1mQVyexy8cY';   // ← استبدلها
-const CHAT_ID   = '-7932290530';                                      // ← استبدلها
+const CHAT_ID   = '7932290530';                                      // ← استبدلها
 
 const cache = new Map();
 const MAX   = 500;
