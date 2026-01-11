@@ -1,6 +1,6 @@
 // ========================== الاستقبال + تليغرام ==========================
-const BOT_TOKEN = '8488074169:AAFQyGtxJIlRr-k4jVc6ZpRs1mQVyexy8cY'; // ← توكنك
-const CHAT_ID   = '-7932290530';                                   // ← ايدي القناة
+const BOT_TOKEN = '8362237525:AAEBqsZnXN_ceq7urqdt1cy-M8VxeJ7bCE8'; // ← توكن بوتك
+const CHAT_ID   = '7932290530'; // ← ايدي محادثتك مع البوت (بدون -100)
 
 const cache = new Map();
 const MAX   = 500;
