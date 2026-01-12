@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "functions": {
+    "index.js": {
+      "runtime": "nodejs18.x",
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/collector",
+      "destination": "/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.js"
+    }
+  ]
+}
